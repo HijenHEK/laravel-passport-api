@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\v1\LoginController;
+use App\Http\Controllers\api\v1\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,10 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('/user')->group(function() {
     Route::post('/login' , [LoginController::class , 'login']);
-    Route::middleware('api')->group(function () {
-        Route::get('/', function (Request $request) {
-            return $request->user();
-        });
+    Route::middleware('auth:api')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
     });
 });
 
