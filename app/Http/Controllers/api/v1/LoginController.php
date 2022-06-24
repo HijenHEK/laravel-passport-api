@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ApiBaseResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class LoginController extends Controller
 {
+
+    use ApiBaseResponse;
+
     public function login(Request $request)
     {
         $data = $request->validate([
@@ -15,17 +19,17 @@ class LoginController extends Controller
             'password' => 'required|string'
         ]);
 
-        if(! auth()->attempt($data)) {
+        if (!auth()->attempt($data)) {
             return response()->json([
                 'message' => 'Invalid credentials'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-         $accessToken = auth()->user()->createToken('authToken')->accessToken ;
+        $accessToken = auth()->user()->createToken('authToken')->accessToken;
 
-         return response()->json([
-             'user' => auth()->user(),
-             'access_token' => $accessToken
-         ]);
+        return $this->success([
+            'message' => 'User logged in successfully',
+            'access_token' => $accessToken
+        ]);
     }
 }

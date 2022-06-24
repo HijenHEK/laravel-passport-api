@@ -4,11 +4,15 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\ApiBaseResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
+
+    use ApiBaseResponse;
+
     public function Register(Request $request)
     {
         $data = $request->validate([
@@ -19,6 +23,8 @@ class RegisterController extends Controller
         $data['password'] = Hash::make($data['password']);
         $user = User::create($data);
 
-        return response($user);
+        return $this->success([
+            'message' => 'User registered successfully !'
+        ]);
     }
 }
