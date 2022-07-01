@@ -17,13 +17,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('/user')->group(function() {
-    Route::post('/login' , [AuthController::class , 'login']);
-    Route::post('/register' , [AuthController::class , 'register']);
+    Route::post('/login' , [AuthController::class , 'login'])->name("login");
+    Route::post('/register' , [AuthController::class , 'register'])->name("register");
 
     Route::middleware('auth:api')->group(function () {
-        Route::get('/', [ProfileController::class, 'show']);
-        Route::post('/logout' , [AuthController::class , 'logout']);
-
+        Route::get('/', [ProfileController::class, 'show'])->name("user.profile");
+        Route::post('/logout' , [AuthController::class , 'logout'])->name("logout");
     });
 });
 
