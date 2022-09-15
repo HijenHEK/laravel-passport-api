@@ -8,11 +8,19 @@ use App\Traits\ApiBaseResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Laravel\Passport\PersonalAccessClient;
 
 class AuthController extends Controller
 {
 
     use ApiBaseResponse;
+
+    /**
+     * login url
+     * @var $login_url
+     */
+    protected $login_url = "laravel-passport-api-laravel.test-1" ;
 
     public function login(Request $request)
     {
@@ -20,6 +28,21 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string'
         ]);
+
+
+        $passport_client = PersonalAccessClient::first();
+
+        $response = Http::asForm()->post( $this->login_url . '/oauth/token', [
+            'grant_type' => 'password',
+            'client_id' => $passport_client->id,
+            'client_secret' => $passport_client->secret,
+            'username' => $data['email'],
+            'password' => $data['password'],
+            'scope' => '*',
+        ]);
+
+        return $response->json();
+
 
         if (!auth()->attempt($data)) {
             return response()->json([
