@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use Laravel\Passport\PersonalAccessClient;
+use Laravel\Passport\Passport;
 
 class AuthController extends Controller
 {
@@ -20,7 +20,7 @@ class AuthController extends Controller
      * login url
      * @var $login_url
      */
-    protected $login_url = "laravel-passport-api-laravel.test-1" ;
+    protected $login_url = "webserver" ;
 
     public function login(Request $request)
     {
@@ -30,7 +30,7 @@ class AuthController extends Controller
         ]);
 
 
-        $passport_client = PersonalAccessClient::first();
+        $passport_client = Passport::client()->where('password_client',1 )->first();
 
         $response = Http::asForm()->post( $this->login_url . '/oauth/token', [
             'grant_type' => 'password',
