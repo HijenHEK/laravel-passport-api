@@ -23,6 +23,7 @@ Route::prefix('/user')->group(function() {
     Route::middleware('auth:api')->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name("user.profile");
         Route::post('/logout' , [AuthController::class , 'logout'])->name("logout");
+        Route::post('/refresh' , [AuthController::class , 'refresh'])->name("refresh");
     });
 });
 
