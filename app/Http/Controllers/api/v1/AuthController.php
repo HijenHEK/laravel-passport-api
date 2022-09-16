@@ -20,7 +20,12 @@ class AuthController extends Controller
      * login url
      * @var $login_url
      */
-    protected $login_url = "webserver" ;
+    protected $login_url ;
+
+    public function __construct()
+    {
+        $this->login_url =  config('app.login_url','webserver');
+    }
 
     public function login(Request $request)
     {

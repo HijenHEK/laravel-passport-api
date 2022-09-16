@@ -56,6 +56,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'login_url' => env('APP_LOGIN_URL','webserver'),
+
     'asset_url' => env('ASSET_URL'),
 
     /*
