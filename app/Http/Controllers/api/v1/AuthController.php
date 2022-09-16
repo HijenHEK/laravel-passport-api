@@ -24,7 +24,7 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->login_url =  config('app.login_url','webserver');
+        $this->login_url =  config('app.login_url');
     }
 
     public function login(Request $request)
@@ -87,5 +87,27 @@ class AuthController extends Controller
         return $this->success([
             'message' => 'User Logged out successfully !'
         ]);
+    }
+
+    public function refresh(Request $request){
+
+
+        $data = $request->validate([
+            'refresh_token' => 'string'
+        ]);
+
+        $passport_client = Passport::client()->where('password_client',1 )->first();
+
+        $response = Http::asForm()->post( $this->login_url . '/oauth/token/refresh', [
+            'grant_type' => 'refresh_token',
+            'client_id' => $passport_client->id,
+            'client_secret' => $passport_client->secret,
+            'refresh_token' => $data['refresh_token'],
+
+            'scope' => '*',
+        ]);
+
+        return $response->json();
+
     }
 }
