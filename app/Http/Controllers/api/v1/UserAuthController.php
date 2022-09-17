@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Laravel\Passport\Passport;
 
-class AuthController extends Controller
+class UserAuthController extends Controller
 {
 
     use ApiBaseResponse;
