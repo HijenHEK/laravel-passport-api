@@ -35,7 +35,7 @@ class AdminAuthController extends Controller
         ]);
 
 
-        $passport_client = Passport::client()->where('password_client',1 )->first();
+        $passport_client = Passport::client()->where('name', "admins")->first();
 
         $response = Http::asForm()->post( $this->login_url . '/oauth/token', [
             'grant_type' => 'password',

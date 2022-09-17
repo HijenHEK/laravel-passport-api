@@ -31,7 +31,7 @@ Route::prefix('/user')->group(function() {
 
 Route::prefix('/admin')->group(function() {
     Route::post('/login' , [AdminAuthController::class , 'login'])->name("admin.login");
-    Route::post('/register' , [AdminAuthController::class , 'register'])->name("admin.register");
+    // Route::post('/register' , [AdminAuthController::class , 'register'])->name("admin.register");
 
     Route::middleware('auth:api')->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name("admin.profile");

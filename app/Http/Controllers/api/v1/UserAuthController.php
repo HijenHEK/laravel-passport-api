@@ -35,7 +35,7 @@ class UserAuthController extends Controller
         ]);
 
 
-        $passport_client = Passport::client()->where('password_client',1 )->first();
+        $passport_client = Passport::client()->where('name', "users")->first();
 
         $response = Http::asForm()->post( $this->login_url . '/oauth/token', [
             'grant_type' => 'password',
