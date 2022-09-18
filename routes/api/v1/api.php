@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\api\v1\AuthController;
+use App\Http\Controllers\api\v1\AdminAuthController;
 use App\Http\Controllers\api\v1\ProfileController;
+use App\Http\Controllers\api\v1\UserAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,13 +18,25 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('/user')->group(function() {
-    Route::post('/login' , [AuthController::class , 'login'])->name("login");
-    Route::post('/register' , [AuthController::class , 'register'])->name("register");
+    Route::post('/login' , [UserAuthController::class , 'login'])->name("user.login");
+    Route::post('/register' , [UserAuthController::class , 'register'])->name("user.register");
 
     Route::middleware('auth:api')->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name("user.profile");
-        Route::post('/logout' , [AuthController::class , 'logout'])->name("logout");
-        Route::post('/refresh' , [AuthController::class , 'refresh'])->name("refresh");
+        Route::post('/logout' , [UserAuthController::class , 'logout'])->name("user.logout");
+        Route::post('/refresh' , [UserAuthController::class , 'refresh'])->name("user.refresh");
+    });
+});
+
+
+Route::prefix('/admin')->group(function() {
+    Route::post('/login' , [AdminAuthController::class , 'login'])->name("admin.login");
+    // Route::post('/register' , [AdminAuthController::class , 'register'])->name("admin.register");
+
+    Route::middleware('auth:api')->group(function () {
+        Route::get('/', [ProfileController::class, 'show'])->name("admin.profile");
+        Route::post('/logout' , [AdminAuthController::class , 'logout'])->name("admin.logout");
+        Route::post('/refresh' , [AdminAuthController::class , 'refresh'])->name("admin.refresh");
     });
 });
 

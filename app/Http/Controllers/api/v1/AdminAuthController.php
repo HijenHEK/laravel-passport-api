@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Admin;
 use App\Traits\ApiBaseResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Laravel\Passport\Passport;
 
-class AuthController extends Controller
+class AdminAuthController extends Controller
 {
 
     use ApiBaseResponse;
@@ -35,7 +35,7 @@ class AuthController extends Controller
         ]);
 
 
-        $passport_client = Passport::client()->where('password_client',1 )->first();
+        $passport_client = Passport::client()->where('name', "admins")->first();
 
         $response = Http::asForm()->post( $this->login_url . '/oauth/token', [
             'grant_type' => 'password',
@@ -58,7 +58,7 @@ class AuthController extends Controller
         $accessToken = auth()->user()->createToken('authToken')->accessToken;
 
         return $this->success([
-            'message' => 'User logged in successfully',
+            'message' => 'Admin logged in successfully',
             'access_token' => $accessToken
         ]);
     }
@@ -67,14 +67,14 @@ class AuthController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|min:4',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|unique:admins,email',
             'password' => 'required|string|min:6|confirmed'
         ]);
         $data['password'] = Hash::make($data['password']);
-        $user = User::create($data);
+        $user = Admin::create($data);
 
         return $this->success([
-            'message' => 'User registered successfully !'
+            'message' => 'Admin registered successfully !'
         ]);
     }
 
@@ -85,7 +85,7 @@ class AuthController extends Controller
         });
 
         return $this->success([
-            'message' => 'User Logged out successfully !'
+            'message' => 'Admin Logged out successfully !'
         ]);
     }
 

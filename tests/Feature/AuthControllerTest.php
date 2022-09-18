@@ -23,7 +23,7 @@ class AuthControllerTest extends TestCase
             "password_confirmation" => "password"
         ];
 
-        $response = $this->postJson(route("register"), $data);
+        $response = $this->postJson(route("user.register"), $data);
 
         $response->assertOk();
 
@@ -50,7 +50,7 @@ class AuthControllerTest extends TestCase
             "password_confirmation" => "password"
         ];
 
-        $response = $this->postJson(route("register"), $data);
+        $response = $this->postJson(route("user.register"), $data);
 
         $response->assertJsonValidationErrorFor("email");
 
@@ -62,7 +62,7 @@ class AuthControllerTest extends TestCase
             "password_confirmation" => "xpassword"
         ];
 
-        $response = $this->postJson(route("register"), $data);
+        $response = $this->postJson(route("user.register"), $data);
 
         $response->assertJsonValidationErrorFor("password");
     }
@@ -82,7 +82,7 @@ class AuthControllerTest extends TestCase
 
         Artisan::call('passport:install');
 
-        $response = $this->postJson(route("login"), $creadentials);
+        $response = $this->postJson(route("user.login"), $creadentials);
 
         $response->assertOk();
 
