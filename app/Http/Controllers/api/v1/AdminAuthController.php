@@ -37,12 +37,7 @@ class AdminAuthController extends Controller
 
         $passport_client = Passport::client()->where('name', "admins")->first();
 
-        if (empty($passport_client)){
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], Response::HTTP_UNAUTHORIZED);
-
-        }
+        abort_unless($passport_client, 500, 'authentication server error');
 
         $response = Http::asForm()->post( $this->login_url . '/oauth/token', [
             'grant_type' => 'password',
