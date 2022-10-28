@@ -36,7 +36,7 @@ class UserAuthController extends Controller
 
 
         $passport_client = Passport::client()->where('name', "users")->first();
-
+        abort_unless($passport_client, 500, 'authentication server error');
         $response = Http::asForm()->post( $this->login_url . '/oauth/token', [
             'grant_type' => 'password',
             'client_id' => $passport_client->id,
@@ -49,18 +49,6 @@ class UserAuthController extends Controller
         return $response->json();
 
 
-        if (!auth()->attempt($data)) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        $accessToken = auth()->user()->createToken('authToken')->accessToken;
-
-        return $this->success([
-            'message' => 'User logged in successfully',
-            'access_token' => $accessToken
-        ]);
     }
 
     public function Register(Request $request)
