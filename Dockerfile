@@ -1,43 +1,44 @@
 FROM php:8.0-fpm
-# Set working directory
-WORKDIR /var/www/html/
 
-# Copy composer.lock and composer.json into the working directory
-COPY composer.lock composer.json ./
+# Arguments defined in docker-compose.yml
+ARG user
+ARG uid
 
-# Install dependencies for the operating system software
+
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    libzip-dev \
-    unzip \
     git \
+    curl \
+    libpng-dev \
     libonig-dev \
-    curl
+    libxml2-dev \
+    libzip-dev \
+    zip \
+    unzip
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install extensions for php
-RUN docker-php-ext-install pdo_mysql zip exif pcntl mbstring
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install gd
 
-# Install composer (php package manager)
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
-# Copy existing application directory contents to the working directory
-COPY . .
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Assign permissions of the working directory to the www-data user
-RUN chmod -R ug+w ./storage ./bootstrap/cache
+# Create system user to run Composer and Artisan Commands
+RUN useradd -G www-data,root -u 1000 -d /home/foulen foulen
+RUN mkdir -p /home/foulen/.composer && \
+    chown -R foulen:foulen /home/foulen
 
-# Expose port 9000 and start php-fpm server (for FastCGI Process Manager)
+# Set working directory
+WORKDIR /var/www
+
+COPY --chown=foulen:foulen . .
+
+RUN composer install
+
+USER foulen
+
 EXPOSE 9000
-CMD ["php-fpm"]

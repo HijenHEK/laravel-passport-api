@@ -1,67 +1,70 @@
-version: '2.0'
+version: "3.7"
 services:
-
-  #PHP Service
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: cloudsigma.com/php
-    container_name: app
-    restart: unless-stopped
-    tty: true
-    environment:
-      SERVICE_NAME: app
-      SERVICE_TAGS: dev
-      APP_LOGIN_URL: webserver
-    working_dir: /var/www/html/
-    volumes:
-        - ./:/var/www/html/
-        - ./docker/php/laravel.ini:/usr/local/etc/php/conf.d/laravel.ini
-    networks:
-        - app-network
-
-  #Nginx Service
-  webserver:
-    image: nginx:alpine
-    container_name: webserver
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "8080:80"
-      - "443:443"
-    volumes:
-      - ./:/var/www/html/
-      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
-    networks:
-      - app-network
-
-  #MySQL Service
-  db:
-    image: mysql:5.7.32
-    container_name: db
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "33066:3306"
-    environment:
-      MYSQL_DATABASE: "${MYSQL_DATABASE}"
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_USER: "${MYSQL_USER}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
-    volumes:
-      - dbdata:/var/lib/mysql/
-      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
-    networks:
-      - app-network
-
-#Docker Networks
+    app-api:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        env_file:
+            - .env
+        image: app
+        container_name: app-api
+        restart: unless-stopped
+        working_dir: /var/www/
+        command: bash -c "composer install && php artisan migrate && php-fpm"
+        volumes:
+            - ./:/var/www
+        networks:
+            - app-api
+            - app-web
+        depends_on:
+            app-db :
+                condition: service_healthy
+    app-db:
+        image: mysql:8.0
+        container_name: app-db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE-database}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD-password}
+            MYSQL_PASSWORD: ${DB_PASSWORD-password}
+            MYSQL_USER: ${DB_USERNAME-foulen}
+        volumes:
+          - app-db:/var/lib/mysql
+        ports:
+            - ${FORWARD_DB_PORT-33066}:3306
+        networks:
+            - app-api
+        healthcheck:
+            test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+            timeout: 20s
+            retries: 10
+    app-web:
+        image: nginx:alpine
+        container_name: app-web
+        restart: unless-stopped
+        depends_on:
+            - app-api
+        ports:
+            - ${APP_PORT-8000}:80
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx:/etc/nginx/conf.d/
+        networks:
+            - app-web
+    app-mail:
+        image: mailhog/mailhog
+        container_name: app-mail
+        ports:
+            - ${MAIL_PORT-8003}:1025
+            - ${MAILHOG_PORT-8100}:8025
+        networks:
+            - app-api
 networks:
-  app-network:
-    driver: bridge
-#Volumes
+    app-api:
+        driver: bridge
+        name: app-api
+    app-web:
+        driver: bridge
+        name: app-web
 volumes:
-  dbdata:
-    driver: local
+    app-db:
