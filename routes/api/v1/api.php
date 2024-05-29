@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\api\v1\AccessTokenController;
 use App\Http\Controllers\api\v1\AdminAuthController;
 use App\Http\Controllers\api\v1\ProfileController;
 use App\Http\Controllers\api\v1\UserAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Passport\Passport;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +43,12 @@ Route::prefix('/admin')->group(function() {
 });
 
 
+// Route::post('oauth/token', [
+//     'middleware' => 'password-grant',
+//     'uses' => '\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken'
+// ]);
+
+// Route::post('oauth/token', AccessTokenController::class);
 
 
 
