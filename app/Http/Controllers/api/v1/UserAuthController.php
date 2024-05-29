@@ -44,8 +44,10 @@ class UserAuthController extends Controller
             'username' => $data['email'],
             'password' => $data['password'],
             'scope' => '*',
+            'claims' => [
+                'email' => $data['email']
+            ]
         ]);
-
         return $response->json();
 
 
